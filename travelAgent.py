@@ -20,11 +20,11 @@ llm = ChatOpenAI(
   api_key=os.environ.get("OPENAI_API_KEY")
 )
 
-# Definir consulta do usuário
-query = """
-	Vou viajar para Holanda em agosto de 2024.
-	Quero que faça para um roteiro de viagem para mim com eventos que irão ocorrer na data da viagem e com o preço de passagem de Natal para Holanda.
-"""
+# # Definir consulta do usuário
+# query = """
+# 	Vou viajar para Holanda em agosto de 2024.
+# 	Quero que faça para um roteiro de viagem para mim com eventos que irão ocorrer na data da viagem e com o preço de passagem de Natal para Holanda.
+# """
 
 def research_agent(query, llm):
   # Carregar ferramentas Langchain
@@ -34,7 +34,7 @@ def research_agent(query, llm):
 	# Criar agente reativo
 	agent = create_react_agent(llm, tools, prompt)
 	# Inicializar executor de agente
-	agent_executor = AgentExecutor(agent=agent, tools=tools, prompt=prompt, verbose=True)
+	agent_executor = AgentExecutor(agent=agent, tools=tools, prompt=prompt)
 	# Executar agente
 	webContext = agent_executor.invoke({"input": query})
 	return webContext['output']
@@ -72,7 +72,7 @@ def get_relevant_docs(query):
 	# Utiliza o retriever para encontrar documentos relevantes com base na consulta
 	relevant_docs = retrivier.invoke(query)
 	# Imprime os documentos relevantes encontrados
-	print(relevant_docs)
+	# print(relevant_docs)
 	# Retorna os documentos relevantes
 	return relevant_docs
 
@@ -110,4 +110,9 @@ def get_response(query, llm):
 	# Retorna a resposta gerada
 	return response
 
-print(get_response(query, llm).content)
+# print(get_response(query, llm).content)
+
+def lambda_handler(event, context):
+	query = event.get("question")
+	response = get_response(query, llm).content
+	return {"body": response, "status": 200}
